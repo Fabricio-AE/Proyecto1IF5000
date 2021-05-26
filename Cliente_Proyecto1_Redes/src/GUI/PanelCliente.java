@@ -100,7 +100,7 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
                     String directorioImagen = this.jfcChooser.getSelectedFile().getAbsolutePath();
                     this.asignarImagen(ImageIO.read(new File(directorioImagen)));
                     this.repaint();
-
+                    this.cliente.getImagen().dispersarPartes();
                 } //if
             }//if source
         } catch (IOException ex) {
@@ -115,12 +115,12 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
 
     @Override
     public void mouseMoved(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
     @Override
@@ -130,17 +130,17 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
 
     @Override
     public void mouseReleased(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
     @Override
     public void mouseEntered(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
     @Override
     public void mouseExited(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
 }//end class

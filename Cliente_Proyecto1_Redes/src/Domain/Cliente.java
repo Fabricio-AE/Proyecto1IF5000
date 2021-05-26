@@ -17,15 +17,15 @@ public class Cliente {
             return instance;
         } else {
             return instance;
-        }
+        }//if-else
     }//getInstance
 
     public void draw(Graphics g) {
         if (this.imagen != null) {
             if (!this.imagen.getPartes().isEmpty()) {
                 this.imagen.draw(g);
-            }
-        }
+            }//if
+        }//if
     }//draw
     
     public void mousePressed(MouseEvent ev){
