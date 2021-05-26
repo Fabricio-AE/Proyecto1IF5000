@@ -5,6 +5,7 @@
  */
 package GUI;
 
+import Domain.Cliente;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.HeadlessException;
@@ -20,6 +21,7 @@ public class VentanaPrincipal extends JFrame {
     
     public VentanaPrincipal() throws HeadlessException {
         super("TFTP");
+        Cliente cliente = Cliente.getInstance();
         this.setSize(new Dimension(800, 600));
         this.setLayout(null);
         this.setLocationRelativeTo(null);
@@ -31,7 +33,7 @@ public class VentanaPrincipal extends JFrame {
     
     private void init(){
         
-        this.panel = new PanelPrincipal("Sesión");
+        this.panel = new PanelPrincipal("SesiÃ³n");
         this.add(this.panel);
         
         

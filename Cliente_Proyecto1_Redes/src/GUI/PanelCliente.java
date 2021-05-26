@@ -5,40 +5,142 @@
  */
 package GUI;
 
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
+import Domain.Cliente;
+import Domain.Imagen;
+import Domain.ParteImagen;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.CropImageFilter;
+import java.awt.image.FilteredImageSource;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
  * @author Fabricio
  */
-public class PanelCliente extends JPanel{
+public class PanelCliente extends JPanel implements ActionListener, MouseMotionListener, MouseListener {
+
     private Border border;
     private JButton jbtnBuscarImagen;
-    
+    private JFileChooser jfcChooser;
+    private Cliente cliente;
+
     public PanelCliente(String titulo) {
-    	super();
+        super();
+        this.cliente = Cliente.getInstance();
         this.setBounds(0, 100, 390, 460);
         this.setLayout(null);
         this.border = new TitledBorder(titulo);
         this.setBorder(this.border);
         this.init();
         this.setVisible(true);
-        
+        this.addMouseListener(this);
+        this.addMouseMotionListener(this);
     }//constructor
-    
-    private void init(){
-    	this.jbtnBuscarImagen = new JButton("Buscar imagen");
-    	this.jbtnBuscarImagen.setBounds(135, 30, 120, 30);
-    	
-    	this.add(this.jbtnBuscarImagen);
-    	
+
+    private void init() {
+        this.jbtnBuscarImagen = new JButton("Buscar imagen");
+        this.jbtnBuscarImagen.setBounds(135, 10, 120, 30);
+        this.jbtnBuscarImagen.addActionListener(this);
+        this.add(this.jbtnBuscarImagen);
     }//init
-    
+
+    public void asignarImagen(BufferedImage img) throws IOException {
+        int width = 350, height = 350;
+        
+        Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        this.cliente.setImagen(new Imagen(tmp));
+
+        int idImagen = 0;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                int posX = j * (width / 5), posY = i * (height / 5);
+
+                Image imagePart = createImage(new FilteredImageSource(tmp.getSource(),
+                        new CropImageFilter(posX, posY, width / 5, height / 5)));
+
+                this.cliente.getImagen().getPartes().add(
+                        new ParteImagen(idImagen++, posX+20, posY+60, imagePart));
+            }//for j
+        }//for i
+
+    }//asignarImagen
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        this.cliente.draw(g);
+        this.repaint();
+    }//paintComponent
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        try {
+            if (ae.getSource() == this.jbtnBuscarImagen) {
+                this.jfcChooser = new JFileChooser();
+                FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imagen", "png", "jpg", "bmp");
+                this.jfcChooser.setFileFilter(filtro);
+                int opcion = this.jfcChooser.showOpenDialog(this);
+                if (opcion == JFileChooser.APPROVE_OPTION) {
+                    String directorioImagen = this.jfcChooser.getSelectedFile().getAbsolutePath();
+                    this.asignarImagen(ImageIO.read(new File(directorioImagen)));
+                    this.repaint();
+
+                } //if
+            }//if source
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }//try-catch   
+    }//actionPerformed
+
+    @Override
+    public void mouseDragged(MouseEvent me) {
+        
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent me) {
+        //System.out.println("Holaaaa 2");
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent me) {
+        //System.out.println("Holaaaa 2");
+    }
+
+    @Override
+    public void mousePressed(MouseEvent me) {
+        this.cliente.mousePressed(me);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent me) {
+        //System.out.println("Holaaaa 2");
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent me) {
+        //System.out.println("Holaaaa 2");
+    }
+
+    @Override
+    public void mouseExited(MouseEvent me) {
+        //System.out.println("Holaaaa 2");
+    }
+
 }//end class

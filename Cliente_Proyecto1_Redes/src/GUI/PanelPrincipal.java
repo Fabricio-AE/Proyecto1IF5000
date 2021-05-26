@@ -61,7 +61,7 @@ public class PanelPrincipal extends JPanel{
         this.jtfUsuario.setBounds(Variables.ESPACIO*16, 50, 110, 20);
         this.containerSesion.add(this.jtfUsuario);
         
-        this.jlblContrasenia = new JLabel("Contraseña");
+        this.jlblContrasenia = new JLabel("ContraseÃ±a");
         this.jlblContrasenia.setBounds(Variables.ESPACIO*31, 10, 110, 50);
         this.containerSesion.add(this.jlblContrasenia);
         
