@@ -123,7 +123,7 @@ public class ClientConnection extends Thread {
             return bufferedImage;
     }//convertirImagen
 
-    public void enviarImagen(ArrayList<ParteImagen> partes) throws IOException {
+    public void enviarImagen(ArrayList<ParteImagen> partes) throws IOException, InterruptedException {
 
         for (int i = 0; i < partes.size(); i++) {
             Element element = new Element("Image");
@@ -135,13 +135,25 @@ public class ClientConnection extends Thread {
             String encodedImage = Base64.getEncoder().encodeToString(baos.toByteArray());
             baos.close();
             Conversiones.anadirAccion(element, "parte de imagen");
+            
             Element eEncodedImage = new Element("encodedImage");
             eEncodedImage.addContent(encodedImage);
+            element.addContent(eEncodedImage);
+            
             Element eIdParte = new Element("id");
             eIdParte.addContent(i + "");
-            element.addContent(eEncodedImage);
             element.addContent(eIdParte);
+            
+            Element ePosX = new Element("posX");
+            ePosX.addContent(partes.get(i).getPosX()+"");
+            element.addContent(ePosX);
+            
+            Element ePosY = new Element("posY");
+            ePosY.addContent(partes.get(i).getPosY()+"");
+            element.addContent(ePosY);
+            
             this.send.println(Conversiones.xmlToString(element));
+            Thread.sleep(100);
         }//for i
 
     }//enviarImagen
