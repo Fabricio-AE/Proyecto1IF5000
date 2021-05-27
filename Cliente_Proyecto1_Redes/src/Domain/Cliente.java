@@ -21,6 +21,7 @@ public class Cliente {
     }//getInstance
 
     public void draw(Graphics g) {
+        g.drawRect(19, 59, 351, 351);
         if (this.imagen != null) {
             if (!this.imagen.getPartes().isEmpty()) {
                 this.imagen.draw(g);

@@ -19,7 +19,7 @@ public class Imagen {
     }//constructor
 
     public void dispersarPartes() {
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < this.partes.size(); i++) {
             int j = (int) (Math.random() * 23);
             int posXSelected = this.partes.get(j).getPosX();
             int posYSelected = this.partes.get(j).getPosY();
