@@ -5,6 +5,7 @@
  */
 package GUI;
 
+import Client.ClientConnection;
 import Domain.Cliente;
 import Domain.Imagen;
 import Domain.ParteImagen;
@@ -37,9 +38,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class PanelCliente extends JPanel implements ActionListener, MouseMotionListener, MouseListener {
 
     private Border border;
-    private JButton jbtnBuscarImagen;
+    private JButton jbtnBuscarImagen, jbtnEnviarImagen, jbtnImagenesRecibidas;
     private JFileChooser jfcChooser;
     private Cliente cliente;
+    private ClientConnection clientConnection;
 
     public PanelCliente(String titulo) {
         super();
@@ -59,21 +61,33 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
         this.jbtnBuscarImagen.setBounds(135, 10, 120, 30);
         this.jbtnBuscarImagen.addActionListener(this);
         this.add(this.jbtnBuscarImagen);
+        
+        this.jbtnEnviarImagen = new JButton("Enviar");
+        this.jbtnEnviarImagen.setBounds(70, 425, 120, 30);
+        this.jbtnEnviarImagen.addActionListener(this);
+        this.add(this.jbtnEnviarImagen);
+        
+        this.jbtnImagenesRecibidas = new JButton("Ver recibidas");
+        this.jbtnImagenesRecibidas.setBounds(120+75, 425, 120, 30);
+        this.jbtnImagenesRecibidas.addActionListener(this);
+        this.add(this.jbtnImagenesRecibidas);
+        
     }//init
 
     public void asignarImagen(BufferedImage img) throws IOException {
         int width = 350, height = 350;
+        int partes = 5;
         
         Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         this.cliente.setImagen(new Imagen(tmp));
 
         int idImagen = 0;
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                int posX = j * (width / 5), posY = i * (height / 5);
+        for (int i = 0; i < partes; i++) {
+            for (int j = 0; j < partes; j++) {
+                int posX = j * (width / partes), posY = i * (height / partes);
 
                 Image imagePart = createImage(new FilteredImageSource(tmp.getSource(),
-                        new CropImageFilter(posX, posY, width / 5, height / 5)));
+                        new CropImageFilter(posX, posY, width / partes, height / partes)));
 
                 this.cliente.getImagen().getPartes().add(
                         new ParteImagen(idImagen++, posX+20, posY+60, imagePart));
@@ -100,9 +114,18 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
                     String directorioImagen = this.jfcChooser.getSelectedFile().getAbsolutePath();
                     this.asignarImagen(ImageIO.read(new File(directorioImagen)));
                     this.repaint();
-
+                    this.cliente.getImagen().dispersarPartes();
                 } //if
-            }//if source
+                
+            }else if(ae.getSource() == this.jbtnEnviarImagen 
+                    && !ClientConnection.isNull()){
+                System.out.println("Estoy enviando...");
+                ClientConnection clientConnection = ClientConnection.getInstance();
+                clientConnection.enviarImagen(this.cliente.getImagen().getPartes());
+            }else if(ae.getSource() == this.jbtnImagenesRecibidas){
+                
+            }//else-if
+                
         } catch (IOException ex) {
             ex.printStackTrace();
         }//try-catch   
@@ -115,12 +138,12 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
 
     @Override
     public void mouseMoved(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
     @Override
@@ -130,17 +153,17 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
 
     @Override
     public void mouseReleased(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
     @Override
     public void mouseEntered(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
     @Override
     public void mouseExited(MouseEvent me) {
-        //System.out.println("Holaaaa 2");
+        
     }
 
 }//end class

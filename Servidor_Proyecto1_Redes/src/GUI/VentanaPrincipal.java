@@ -1,0 +1,44 @@
+package GUI;
+
+import java.awt.Graphics;
+import java.net.UnknownHostException;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import Domain.Server;
+import Server.MyServer;
+
+public class VentanaPrincipal extends JPanel {
+
+	private MyServer myServer;
+	private Server admin;
+	private JLabel jlblIpServer;
+
+	public VentanaPrincipal() {
+		try {
+			this.myServer = new MyServer();
+			this.myServer.start();
+			this.admin = Server.getInstance();
+			this.setSize(400, 400);
+			this.setLayout(null);
+			this.init();
+			this.setVisible(true);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} // try-catch
+	}// constructor
+
+	public void init() {
+		this.jlblIpServer=new JLabel(this.myServer.getIpServer());
+		this.jlblIpServer.setBounds(150,150,200,30);
+		this.add(this.jlblIpServer);
+	}//init
+	
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		/*this.admin.draw(g);*/
+		this.repaint();
+	}
+
+}// end class
