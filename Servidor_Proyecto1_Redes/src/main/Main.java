@@ -19,11 +19,12 @@ public class Main {
      */
     public static void main(String[] args) {
         JFrame jframe = new JFrame();
-        jframe.setSize(400, 400);
+        jframe.setSize(410, 500);
         jframe.add(new VentanaPrincipal());
         jframe.setLocationRelativeTo(null);
         jframe.setLayout(null);
         jframe.setVisible(true);
+        jframe.setResizable(false);
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }//main
 

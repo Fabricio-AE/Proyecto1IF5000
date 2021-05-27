@@ -5,6 +5,8 @@
  */
 package Domain;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Fabricio

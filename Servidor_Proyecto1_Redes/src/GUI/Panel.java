@@ -1,15 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package GUI;
 
-import Client.ClientConnection;
 import Domain.Cliente;
 import Domain.Imagen;
 import Domain.ParteImagen;
-import Utility.Conversiones;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -22,8 +15,6 @@ import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 import javax.swing.JButton;
@@ -32,23 +23,22 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import org.jdom.Element;
 
 /**
  *
  * @author Fabricio
  */
-public class PanelCliente extends JPanel implements ActionListener, MouseMotionListener, MouseListener {
+public class Panel extends JPanel implements ActionListener, MouseMotionListener, MouseListener {
 
     private Border border;
     private JButton jbtnBuscarImagen, jbtnEnviarImagen, jbtnImagenesRecibidas;
     private JFileChooser jfcChooser;
     private Cliente cliente;
 
-    public PanelCliente(String titulo) {
+    public Panel(String titulo) {
         super();
         this.cliente = Cliente.getInstance();
-        this.setBounds(0, 100, 390, 460);
+        this.setBounds(0, 0, 390, 460);
         this.setLayout(null);
         this.border = new TitledBorder(titulo);
         this.setBorder(this.border);
@@ -119,21 +109,16 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
                     this.cliente.getImagen().dispersarPartes();
                 } //if
                 
-            }else if(ae.getSource() == this.jbtnEnviarImagen 
-                    && !ClientConnection.isNull()){
+            }else if(ae.getSource() == this.jbtnEnviarImagen ){
                 System.out.println("Estoy enviando...");
-                ClientConnection clientConnection = ClientConnection.getInstance();
-                clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "nueva imagen"));
-                clientConnection.enviarImagen(this.cliente.getImagen().getPartes());
-                
+                /*ClientConnection clientConnection = ClientConnection.getInstance();
+                clientConnection.enviarImagen(this.cliente.getImagen().getPartes());*/
             }else if(ae.getSource() == this.jbtnImagenesRecibidas){
                 
             }//else-if
                 
         } catch (IOException ex) {
             ex.printStackTrace();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(PanelCliente.class.getName()).log(Level.SEVERE, null, ex);
         }//try-catch   
     }//actionPerformed
 

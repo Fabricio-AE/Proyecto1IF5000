@@ -20,7 +20,7 @@ public class VentanaPrincipal extends JPanel {
 			this.myServer = new MyServer();
 			this.myServer.start();
 			this.admin = Server.getInstance();
-			this.setSize(400, 400);
+			this.setSize(390, 460);
 			this.setLayout(null);
 			this.init();
 			this.setVisible(true);
@@ -30,9 +30,15 @@ public class VentanaPrincipal extends JPanel {
 	}// constructor
 
 	public void init() {
+		/*
 		this.jlblIpServer=new JLabel(this.myServer.getIpServer());
 		this.jlblIpServer.setBounds(150,150,200,30);
-		this.add(this.jlblIpServer);
+		this.add(this.jlblIpServer);*/
+		
+		Panel panel = new Panel("Server");
+		this.add(panel);
+		
+		
 	}//init
 	
 	public void paintComponent(Graphics g) {

@@ -8,24 +8,25 @@ import java.util.ArrayList;
 
 public class Imagen {
 
+    private Image imagen;
     private boolean isSelected;
     private ArrayList<ParteImagen> partes;
 
     public Imagen(Image image) throws IOException {
-        /*this.imagen = image;*/
+        this.imagen = image;
         this.isSelected = false;
         this.partes = new ArrayList<>();
     }//constructor
     
     public Imagen() throws IOException {
-        /*this.imagen = null;*/
+        this.imagen = null;
         this.isSelected = false;
         this.partes = new ArrayList<>();
     }//constructor
 
     public void dispersarPartes() {
         for (int i = 0; i < this.partes.size(); i++) {
-            int j = (int) (Math.random() * this.partes.size());
+            int j = (int) (Math.random() * 23);
             int posXSelected = this.partes.get(j).getPosX();
             int posYSelected = this.partes.get(j).getPosY();
 
@@ -82,7 +83,7 @@ public class Imagen {
         return -1;
     }//isActive
 
-    /*setters and getters*//*
+    /*setters and getters*/
     public Image getImagen() {
         return imagen;
     }
@@ -90,7 +91,7 @@ public class Imagen {
     public void setImagen(Image imagen) {
         this.imagen = imagen;
     }
-*/
+
     public ArrayList<ParteImagen> getPartes() {
         return partes;
     }
