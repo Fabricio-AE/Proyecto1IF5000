@@ -38,8 +38,8 @@ public class ConsultaCliente extends Thread {
 		this.send = new PrintStream(this.socket.getOutputStream());
 		this.receive = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 		this.conectado = true;
-		this.cliente = Cliente.getInstance();
-		cliente.setImagen(new Imagen());
+		//this.cliente = Cliente.getInstance();
+		//this.cliente.setImagen(new Imagen());
 	}// constructor
 
 	public void run() {
@@ -78,6 +78,10 @@ public class ConsultaCliente extends Thread {
 			this.socket.close();
 			break;
 
+		case "iniciar sesion":
+			this.cliente = new Cliente("1", "Fabricio", "123");
+			break;
+
 		case "nueva imagen":
 			this.cliente.getImagen().getPartes().clear();
 			break;
@@ -87,6 +91,10 @@ public class ConsultaCliente extends Thread {
 			break;
 
 		case "verificar llegada":
+
+			break;
+
+		case "ver archivos":
 
 			break;
 		default:

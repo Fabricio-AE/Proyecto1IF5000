@@ -3,6 +3,8 @@ package GUI;
 import Domain.Cliente;
 import Domain.Imagen;
 import Domain.ParteImagen;
+import Domain.Server;
+
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -33,11 +35,11 @@ public class Panel extends JPanel implements ActionListener, MouseMotionListener
     private Border border;
     private JButton jbtnBuscarImagen, jbtnEnviarImagen, jbtnImagenesRecibidas;
     private JFileChooser jfcChooser;
-    private Cliente cliente;
+    private Server server;
 
     public Panel(String titulo) {
         super();
-        this.cliente = Cliente.getInstance();
+        this.server = Server.getInstance();
         this.setBounds(0, 0, 390, 460);
         this.setLayout(null);
         this.border = new TitledBorder(titulo);
@@ -66,7 +68,7 @@ public class Panel extends JPanel implements ActionListener, MouseMotionListener
         
     }//init
 
-    public void asignarImagen(BufferedImage img) throws IOException {
+    /*public void asignarImagen(BufferedImage img) throws IOException {
         int width = 350, height = 350;
         int partes = 5;
         
@@ -86,17 +88,17 @@ public class Panel extends JPanel implements ActionListener, MouseMotionListener
             }//for j
         }//for i
 
-    }//asignarImagen
+    }//asignarImagen*/
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        this.cliente.draw(g);
+        /*this.cliente.draw(g);*/
         this.repaint();
     }//paintComponent
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        try {
+        /*try {
             if (ae.getSource() == this.jbtnBuscarImagen) {
                 this.jfcChooser = new JFileChooser();
                 FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imagen", "png", "jpg", "bmp");
@@ -111,15 +113,15 @@ public class Panel extends JPanel implements ActionListener, MouseMotionListener
                 
             }else if(ae.getSource() == this.jbtnEnviarImagen ){
                 System.out.println("Estoy enviando...");
-                /*ClientConnection clientConnection = ClientConnection.getInstance();
-                clientConnection.enviarImagen(this.cliente.getImagen().getPartes());*/
+                ClientConnection clientConnection = ClientConnection.getInstance();
+                clientConnection.enviarImagen(this.cliente.getImagen().getPartes());
             }else if(ae.getSource() == this.jbtnImagenesRecibidas){
                 
             }//else-if
                 
         } catch (IOException ex) {
             ex.printStackTrace();
-        }//try-catch   
+        }//try-catch   */
     }//actionPerformed
 
     @Override
@@ -139,7 +141,7 @@ public class Panel extends JPanel implements ActionListener, MouseMotionListener
 
     @Override
     public void mousePressed(MouseEvent me) {
-        this.cliente.mousePressed(me);
+        //this.cliente.mousePressed(me);
     }
 
     @Override
