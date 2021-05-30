@@ -60,7 +60,7 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
 
     private void init() {
         this.jbtnBuscarImagen = new JButton("Buscar imagen");
-        this.jbtnBuscarImagen.setBounds(135, 10, 120, 30);
+        this.jbtnBuscarImagen.setBounds(this.getWidth()/2-60, 10, 120, 30);
         this.jbtnBuscarImagen.addActionListener(this);
         this.add(this.jbtnBuscarImagen);
         

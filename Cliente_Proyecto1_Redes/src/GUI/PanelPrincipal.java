@@ -6,6 +6,7 @@
 package GUI;
 
 import Client.ClientConnection;
+import Utility.Conversiones;
 import Utility.Variables;
 import java.awt.Color;
 import java.awt.Container;
@@ -21,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import org.jdom.Element;
 
 /**
  *
@@ -107,7 +109,8 @@ public class PanelPrincipal extends JPanel implements ActionListener{
             try {
                 Variables.IPSERVER = this.jtfServidor.getText();
                 System.out.println(Variables.IPSERVER);
-                ClientConnection.getInstance();
+                ClientConnection cli = ClientConnection.getInstance();
+                cli.enviar(Conversiones.anadirAccion(new Element("coneccion"), "iniciar sesion"));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }//try-catch
