@@ -41,10 +41,10 @@ public class Cliente {
 		if (this.imagen.getPartes().size() == 25) {// cambiar el 25 por una variable en Variables
 			Collections.sort(this.imagen.getPartes(), new OrdenarArray());
 			int width = 350, height = 350;
-			int partes = 5;
+			int partes = 5;//recibir por parametro a la hora de enviar las partes
 			int cont = 0;
-			for (int i = 0; i < 5; i++) {
-				for (int j = 0; j < 5; j++) {
+			for (int i = 0; i < partes; i++) {
+				for (int j = 0; j < partes; j++) {
 					int posX = j * (width / partes), posY = i * (height / partes);
 					this.imagen.getPartes().get(cont).setPosX(posX + 20);
 					this.imagen.getPartes().get(cont).setPosY(posY + 60);
