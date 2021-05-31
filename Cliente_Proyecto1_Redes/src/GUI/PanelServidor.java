@@ -5,52 +5,140 @@
  */
 package GUI;
 
-import java.awt.Color;
-import java.awt.Dimension;
+import Client.ClientConnection;
+import Domain.Imagen;
+import Domain.ParteImagen;
+import Domain.Servidor;
+import Utility.Conversiones;
+import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.awt.image.CropImageFilter;
+import java.awt.image.FilteredImageSource;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import org.jdom.Element;
 
 /**
  *
  * @author Fabricio
  */
-public class PanelServidor extends JPanel implements ActionListener{
+public class PanelServidor extends JPanel implements ActionListener, MouseListener {
 
+    //private static PanelServidor instance = null;
     private Border border;
-    private JButton jbtnBuscarImagen, jbtnObtenerImagen;
+    private JButton jbtnListarImagenes, jbtnVer, jbtnObtenerImagen;
+    private JComboBox<String> jcbImagenes;
+    private Servidor servidor;
 
     public PanelServidor(String titulo) {
         super();
-        this.setBounds(395, 100, 390, 460);
+        this.servidor = Servidor.getInstance();
+        this.setBounds(400, 100, 390, 560);
         this.setLayout(null);
         this.border = new TitledBorder(titulo);
         this.setBorder(this.border);
         this.init();
         this.setVisible(true);
-        this.init();
+        this.addMouseListener(this);
     }//constructor
 
     private void init() {
-        this.jbtnBuscarImagen = new JButton("Buscar imagen");
-        this.jbtnBuscarImagen.setBounds(this.getWidth()/2-60, 10, 120, 30);
-        this.jbtnBuscarImagen.addActionListener(this);
-        this.add(this.jbtnBuscarImagen);
+        this.jbtnListarImagenes = new JButton("Listar imagenes");
+        this.jbtnListarImagenes.setBounds(this.getWidth() / 2 - 65, 10, 130, 30);
+        this.jbtnListarImagenes.addActionListener(this);
+        this.add(this.jbtnListarImagenes);
+
+        this.jcbImagenes = new JComboBox<>();
+        this.jcbImagenes.setBounds(this.getWidth() / 2 - 60, 50, 120, 30);
+        this.add(this.jcbImagenes);
+        
+        this.jbtnVer = new JButton("Ver");
+        this.jbtnVer.setBounds(this.getWidth() / 2 + 65, 50, 60, 30);
+        this.jbtnVer.addActionListener(this);
+        this.add(this.jbtnVer);
 
         this.jbtnObtenerImagen = new JButton("Obtener");
-        this.jbtnObtenerImagen.setBounds(this.getWidth()/2-60, 425, 120, 30);
+        this.jbtnObtenerImagen.setBounds(this.getWidth() / 2 - 60, 500, 120, 30);
         this.jbtnObtenerImagen.addActionListener(this);
         this.add(this.jbtnObtenerImagen);
 
     }//init
+    
+    private void initJComboBox(){
+        this.jcbImagenes.removeAllItems();
+        ArrayList<String> imagenes = this.servidor.getImagenes();
+        for (int i = 0; i < imagenes.size(); i++) {
+            this.jcbImagenes.addItem(imagenes.get(i));
+        }//for i
+    }//initJComboBox
+    
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        this.servidor.draw(g);
+        this.repaint();
+    }//paintComponent
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        
+        try {
+            if (ae.getSource() == this.jbtnListarImagenes) {
+                ClientConnection clientConnection = ClientConnection.getInstance();
+                clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "ver imagenes"));
+                Thread.sleep(500);
+                this.initJComboBox();
+            }else if(ae.getSource() == this.jbtnVer){
+                ClientConnection clientConnection = ClientConnection.getInstance();
+                Element msg = new Element("msg");
+                
+                Element nombre = new Element("nombre");
+                nombre.addContent((String)this.jcbImagenes.getSelectedItem());
+                
+                msg.addContent(nombre);
+                clientConnection.enviar(Conversiones.anadirAccion(msg, "ver imagen"));
+                Thread.sleep(500);
+                this.repaint();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (InterruptedException ex) {
+            ex.printStackTrace();
+        }
+    }//actionPerformed
+
+    @Override
+    public void mouseClicked(MouseEvent me) {
+
+    }
+
+    @Override
+    public void mousePressed(MouseEvent me) {
+        this.servidor.mousePressed(me);
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent me) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent me) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent me) {
+
     }
 
 }//end class

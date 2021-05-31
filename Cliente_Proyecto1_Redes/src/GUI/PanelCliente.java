@@ -38,24 +38,23 @@ import org.jdom.Element;
  *
  * @author Fabricio
  */
-public class PanelCliente extends JPanel implements ActionListener, MouseMotionListener, MouseListener {
+public class PanelCliente extends JPanel implements ActionListener, MouseListener {
 
     private Border border;
     private JButton jbtnBuscarImagen, jbtnEnviarImagen, jbtnImagenesRecibidas;
     private JFileChooser jfcChooser;
     private Cliente cliente;
 
-    public PanelCliente(String titulo) {
+    public PanelCliente(String titulo) throws IOException {
         super();
         this.cliente = Cliente.getInstance();
-        this.setBounds(0, 100, 390, 460);
+        this.setBounds(0, 100, 390, 560);
         this.setLayout(null);
         this.border = new TitledBorder(titulo);
         this.setBorder(this.border);
         this.init();
         this.setVisible(true);
         this.addMouseListener(this);
-        this.addMouseMotionListener(this);
     }//constructor
 
     private void init() {
@@ -65,38 +64,16 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
         this.add(this.jbtnBuscarImagen);
         
         this.jbtnEnviarImagen = new JButton("Enviar");
-        this.jbtnEnviarImagen.setBounds(70, 425, 120, 30);
+        this.jbtnEnviarImagen.setBounds(this.getWidth()/2-125, 500, 120, 30);
         this.jbtnEnviarImagen.addActionListener(this);
         this.add(this.jbtnEnviarImagen);
         
         this.jbtnImagenesRecibidas = new JButton("Ver recibidas");
-        this.jbtnImagenesRecibidas.setBounds(120+75, 425, 120, 30);
+        this.jbtnImagenesRecibidas.setBounds(this.getWidth()/2+5, 500, 120, 30);
         this.jbtnImagenesRecibidas.addActionListener(this);
         this.add(this.jbtnImagenesRecibidas);
         
     }//init
-
-    public void asignarImagen(BufferedImage img) throws IOException {
-        int width = 350, height = 350;
-        int partes = 5;
-        
-        Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        this.cliente.setImagen(new Imagen(tmp));
-
-        int idImagen = 0;
-        for (int i = 0; i < partes; i++) {
-            for (int j = 0; j < partes; j++) {
-                int posX = j * (width / partes), posY = i * (height / partes);
-
-                Image imagePart = createImage(new FilteredImageSource(tmp.getSource(),
-                        new CropImageFilter(posX, posY, width / partes, height / partes)));
-
-                this.cliente.getImagen().getPartes().add(
-                        new ParteImagen(idImagen++, posX+20, posY+60, imagePart));
-            }//for j
-        }//for i
-
-    }//asignarImagen
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -114,7 +91,9 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
                 int opcion = this.jfcChooser.showOpenDialog(this);
                 if (opcion == JFileChooser.APPROVE_OPTION) {
                     String directorioImagen = this.jfcChooser.getSelectedFile().getAbsolutePath();
-                    this.asignarImagen(ImageIO.read(new File(directorioImagen)));
+                    Imagen img = new Imagen();
+                    img.asignarImagen(ImageIO.read(new File(directorioImagen)));
+                    this.cliente.setImagen(img);
                     this.repaint();
                     this.cliente.getImagen().dispersarPartes();
                 } //if
@@ -127,8 +106,9 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
                 clientConnection.enviarImagen(this.cliente.getImagen().getPartes());
                 
             }else if(ae.getSource() == this.jbtnImagenesRecibidas){
-                
-            }//else-if
+                ClientConnection clientConnection = ClientConnection.getInstance();
+                clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "ver imagenes"));
+            }
                 
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -136,16 +116,6 @@ public class PanelCliente extends JPanel implements ActionListener, MouseMotionL
             Logger.getLogger(PanelCliente.class.getName()).log(Level.SEVERE, null, ex);
         }//try-catch   
     }//actionPerformed
-
-    @Override
-    public void mouseDragged(MouseEvent me) {
-        
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent me) {
-        
-    }
 
     @Override
     public void mouseClicked(MouseEvent me) {

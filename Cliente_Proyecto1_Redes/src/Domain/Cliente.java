@@ -12,16 +12,13 @@ public class Cliente {
     }//constructor
 
     public static Cliente getInstance() {
-        if (instance == null) {
+        if (instance == null) 
             instance = new Cliente();
-            return instance;
-        } else {
-            return instance;
-        }//if-else
+        return instance;
     }//getInstance
 
     public void draw(Graphics g) {
-        g.drawRect(19, 59, 351, 351);
+        g.drawRect(19, 89, 351, 351);
         if (this.imagen != null) {
             if (!this.imagen.getPartes().isEmpty()) {
                 this.imagen.draw(g);

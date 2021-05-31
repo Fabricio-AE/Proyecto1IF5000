@@ -12,6 +12,7 @@ import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 
+import Data.ClienteData;
 import Utility.OrdenarArray;
 
 public class Cliente {
@@ -51,27 +52,15 @@ public class Cliente {
 					cont++;
 				} // for j
 			} // for i
-			this.guardarImagen(width, height, 5);
+			ClienteData clienteData = new ClienteData();
+			clienteData.guardarImagen(this.id, this.imagen,width , height, partes);
 		} // if
 	}// agregarParteImagen
 
-	public void guardarImagen(int width, int height, int partes) throws IOException {
-		File directorio = new File("../archivos/" + this.id + "/armadas");
-		if (!directorio.exists()) {
-			directorio.mkdirs();
-		}
-		BufferedImage biResultado = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-		Graphics g = biResultado.getGraphics();
-		int cont = 0;
-		for (int i = 0; i < partes; i++) {
-			for (int j = 0; j < partes; j++) {
-				int posX = j * (width / partes), posY = i * (height / partes);
-				g.drawImage(this.imagen.getPartes().get(cont++).getImagen(), posX, posY, null);
-			}//for j
-		}//for i
-		String[] numero = directorio.list();
-		ImageIO.write(biResultado, "PNG", new File("../archivos/" + this.id + "/armadas/"+(numero.length+1)+".png"));
-	}// guardarImagen
+	public ArrayList<String> verImagenes() {
+		ClienteData clienteData = new ClienteData();
+		return clienteData.verImagenes(this.id);
+	}//verImagenes
 
 	public void mousePressed(MouseEvent ev) {
 		if (this.imagen != null) {
@@ -87,5 +76,39 @@ public class Cliente {
 	public void setImagen(Imagen imagen) {
 		this.imagen = imagen;
 	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getContrasenia() {
+		return contrasenia;
+	}
+
+	public void setContrasenia(String contrasenia) {
+		this.contrasenia = contrasenia;
+	}
+
+	public ArrayList<String> getArchivos() {
+		return archivos;
+	}
+
+	public void setArchivos(ArrayList<String> archivos) {
+		this.archivos = archivos;
+	}
+	
+	
 
 }// end class
