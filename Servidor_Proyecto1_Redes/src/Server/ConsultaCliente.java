@@ -4,12 +4,14 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Base64;
 
 import javax.imageio.ImageIO;
@@ -17,6 +19,7 @@ import javax.imageio.ImageIO;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 
+import Data.ClienteData;
 import Domain.Cliente;
 import Domain.Imagen;
 import Domain.ParteImagen;
@@ -94,8 +97,13 @@ public class ConsultaCliente extends Thread {
 
 			break;
 
-		case "ver archivos":
-
+		case "ver imagenes":
+			this.verImagenes();
+			break;
+			
+		case "ver imagen":
+			this.verImagen(accion);
+			
 			break;
 		default:
 			break;
@@ -135,40 +143,41 @@ public class ConsultaCliente extends Thread {
 				Image.SCALE_SMOOTH);
 		return tmp;
 	}// cargarImagenPersonaje
+	
+	public void verImagenes() {
+		ArrayList<String> temp = this.cliente.verImagenes();
+		Element eImagenes = new Element("imagenes");
+		for (int i = 0; i < temp.size(); i++) {
+			Element eImagen = new Element("imagen");
+			eImagen.addContent(temp.get(i));
+			eImagenes.addContent(eImagen);
+		}//for i
+		
+		this.enviar(Conversiones.anadirAccion(eImagenes, "listar imagenes"));
+		
+	}//verImagenes
+	
+	public void verImagen(Element element1) throws IOException {
+		Element element = new Element("Imagen");
+		ClienteData clienteData = new ClienteData();
+		
+		System.out.println(element1.getChild("nombre").getValue());
 
-	public void iniciarSesion(Element eUsuario) throws FileNotFoundException, IOException, JDOMException {
-		/*
-		 * UsuarioBusiness usuarioBusiness = new UsuarioBusiness();
-		 * 
-		 * Usuario usrTemp =
-		 * usuarioBusiness.buscarUsuario(eUsuario.getAttributeValue("nombre"));
-		 * 
-		 * if (usrTemp != null) { if
-		 * (usrTemp.getContrasenia().equals(eUsuario.getChild("contrasenia").getValue())
-		 * ) { if (!this.comprobarUsuarioYaActivo(usrTemp)) { Element element =
-		 * Conversiones.usuarioToXML(usrTemp);
-		 * this.enviar(Conversiones.anadirAccion(element, "Logueado")); Element accion =
-		 * Conversiones.stringToXML(this.receive.readLine());
-		 * 
-		 * BufferedImage image; if
-		 * (accion.getChild("accion").getValue().equals("personalizada")) { image =
-		 * this.cargarImagenPersonaje(accion.getChild("encodedImage").getValue()); }
-		 * else { image =
-		 * ImageIO.read(getClass().getResourceAsStream(accion.getChild("directorio").
-		 * getValue())); } Administrador admin = Administrador.getInstance(); Usuario
-		 * uListo = new Usuario(usrTemp.getNombre(), usrTemp.getContrasenia(),
-		 * usrTemp.getPartidasGanadas(), usrTemp.getMonedas(), new Jugador(0, image),
-		 * this.socket); this.conectado = false;
-		 * 
-		 * admin.agregarUsuario(uListo); uListo.start();
-		 * this.enviar(admin.usuariosActivos()); } else { Element element = new
-		 * Element("Respuesta"); this.enviar(Conversiones.anadirAccion(element,
-		 * "ClienteActivo")); } } else { Element element = new Element("Respuesta");
-		 * this.enviar(Conversiones.anadirAccion(element, "contraseniaIncorrecta")); } }
-		 * else { Element element = new Element("Respuesta");
-		 * this.enviar(Conversiones.anadirAccion(element, "NoExiste")); }
-		 */
-	}// iniciarSesion
+        BufferedImage img = clienteData.verImagen(this.cliente.getId(), element1.getChild("nombre").getValue());
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(img, "png", baos);
+        baos.flush();
+        String encodedImage = Base64.getEncoder().encodeToString(baos.toByteArray());
+        baos.close();
+
+        Element eEncodedImage = new Element("encodedImage");
+        eEncodedImage.addContent(encodedImage);
+        element.addContent(eEncodedImage);
+        
+        Conversiones.anadirAccion(element, "ver imagen");
+
+        this.send.println(Conversiones.xmlToString(element));
+	}//verImagen
 
 	public boolean comprobarUsuarioYaActivo(Usuario usrTemp) {
 		/*

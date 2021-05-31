@@ -5,7 +5,9 @@
  */
 package Client;
 
+import Domain.Imagen;
 import Domain.ParteImagen;
+import Domain.Servidor;
 import Utility.Conversiones;
 import Utility.Variables;
 import java.awt.Graphics2D;
@@ -13,6 +15,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -75,11 +78,11 @@ public class ClientConnection extends Thread {
                 try {
                     this.escuchando();
                 } catch (IOException ex) {
-                    Logger.getLogger(ClientConnection.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 } catch (JDOMException ex) {
-                    Logger.getLogger(ClientConnection.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 } catch (InterruptedException ex) {
-                    Logger.getLogger(ClientConnection.class.getName()).log(Level.SEVERE, null, ex);
+                    ex.printStackTrace();
                 }//try-catch
 
             }//if
@@ -104,23 +107,27 @@ public class ClientConnection extends Thread {
         String opcion = element.getChild("accion").getValue();
         System.out.println("Opcion: " + opcion);
         switch (opcion) {
-            case "imprimir":
-                System.out.println("HOLA");
+            case "listar imagenes":
+                this.listarImagenes(element);
+                break;
+
+            case "ver imagen":
+                this.verImagen(element);
                 break;
         }//switch
 
     }//identificarAccion
-    
-    public BufferedImage convertirImagen(Image img){
-            BufferedImage bufferedImage = new BufferedImage(img.getWidth(null)
-                    , img.getHeight(null)
-                    , BufferedImage.TYPE_INT_ARGB);
-            
-            Graphics2D bGr = bufferedImage.createGraphics();
-            bGr.drawImage(img, 0, 0, null);
-            bGr.dispose();
-            
-            return bufferedImage;
+
+    public BufferedImage convertirImagen(Image img) {
+        BufferedImage bufferedImage = new BufferedImage(img.getWidth(null),
+                img.getHeight(null),
+                BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D bGr = bufferedImage.createGraphics();
+        bGr.drawImage(img, 0, 0, null);
+        bGr.dispose();
+
+        return bufferedImage;
     }//convertirImagen
 
     public void enviarImagen(ArrayList<ParteImagen> partes) throws IOException, InterruptedException {
@@ -128,34 +135,55 @@ public class ClientConnection extends Thread {
         for (int i = 0; i < partes.size(); i++) {
             Element element = new Element("Image");
 
-            BufferedImage img = this.convertirImagen(partes.get(i).getImagen());            
+            BufferedImage img = this.convertirImagen(partes.get(i).getImagen());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(img, "png", baos);
             baos.flush();
             String encodedImage = Base64.getEncoder().encodeToString(baos.toByteArray());
             baos.close();
             Conversiones.anadirAccion(element, "parte de imagen");
-            
+
             Element eEncodedImage = new Element("encodedImage");
             eEncodedImage.addContent(encodedImage);
             element.addContent(eEncodedImage);
-            
+
             Element eIdParte = new Element("id");
             eIdParte.addContent(i + "");
             element.addContent(eIdParte);
-            
+
             Element ePosX = new Element("posX");
-            ePosX.addContent(partes.get(i).getPosX()+"");
+            ePosX.addContent(partes.get(i).getPosX() + "");
             element.addContent(ePosX);
-            
+
             Element ePosY = new Element("posY");
-            ePosY.addContent(partes.get(i).getPosY()+"");
+            ePosY.addContent(partes.get(i).getPosY() + "");
             element.addContent(ePosY);
-            
+
             this.send.println(Conversiones.xmlToString(element));
             Thread.sleep(100);
         }//for i
 
     }//enviarImagen
+
+    public void listarImagenes(Element element) {
+        ArrayList<String> imagenes = new ArrayList<>();
+        for (int i = 0; i < element.getChildren("imagen").size(); i++) {
+            Element e = (Element) element.getChildren("imagen").get(i);
+            imagenes.add(e.getValue());
+        }//for i
+        Servidor servidor = Servidor.getInstance();
+        servidor.setImagenes(imagenes);
+    }//listarImagenes
+
+    public void verImagen(Element element) throws IOException {
+        Servidor servidor = Servidor.getInstance();
+        String encodedImage = element.getChild("encodedImage").getValue();
+        byte[] bytes = Base64.getDecoder().decode(encodedImage);
+        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(bytes));
+        Image tmp = bufferedImage.getScaledInstance(bufferedImage.getWidth(), bufferedImage.getHeight(),
+                Image.SCALE_SMOOTH);
+        servidor.setImagen(new Imagen());
+        servidor.getImagen().asignarImagen(tmp);
+    }//verImagen
 
 }//end class

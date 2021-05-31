@@ -3,16 +3,23 @@ package Domain;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.CropImageFilter;
+import java.awt.image.FilteredImageSource;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.swing.JPanel;
+import java.awt.Component;
+import java.awt.Graphics2D;
 
-public class Imagen {
+public class Imagen{
 
     private boolean isSelected;
+    private Image imagen;
     private ArrayList<ParteImagen> partes;
 
     public Imagen(Image image) throws IOException {
-        /*this.imagen = image;*/
+        this.imagen = image;
         this.isSelected = false;
         this.partes = new ArrayList<>();
     }//constructor
@@ -22,6 +29,44 @@ public class Imagen {
         this.isSelected = false;
         this.partes = new ArrayList<>();
     }//constructor
+    
+    public BufferedImage convertirImagen(Image img) {
+        BufferedImage bufferedImage = new BufferedImage(img.getWidth(null),
+                img.getHeight(null),
+                BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D bGr = bufferedImage.createGraphics();
+        bGr.drawImage(img, 0, 0, null);
+        bGr.dispose();
+
+        return bufferedImage;
+    }//convertirImagen
+    
+    public void asignarImagen(Image img) throws IOException {
+        int width = 350, height = 350;
+        int partes = 5;
+        Component comp = new Component() {
+        };
+        
+        BufferedImage bi = convertirImagen(img);
+        
+        Image tmp = bi.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        this.imagen = tmp;
+
+        int idImagen = 0;
+        for (int i = 0; i < partes; i++) {
+            for (int j = 0; j < partes; j++) {
+                int posX = j * (width / partes), posY = i * (height / partes);
+
+                Image imagePart = comp.createImage(new FilteredImageSource(tmp.getSource(),
+                        new CropImageFilter(posX, posY, width / partes, height / partes)));
+
+                this.partes.add(
+                        new ParteImagen(idImagen++, posX+20, posY+90, imagePart));
+            }//for j
+        }//for i
+
+    }//asignarImagen
 
     public void dispersarPartes() {
         for (int i = 0; i < this.partes.size(); i++) {
@@ -82,7 +127,7 @@ public class Imagen {
         return -1;
     }//isActive
 
-    /*setters and getters*//*
+    /*setters and getters*/
     public Image getImagen() {
         return imagen;
     }
@@ -90,7 +135,7 @@ public class Imagen {
     public void setImagen(Image imagen) {
         this.imagen = imagen;
     }
-*/
+
     public ArrayList<ParteImagen> getPartes() {
         return partes;
     }
