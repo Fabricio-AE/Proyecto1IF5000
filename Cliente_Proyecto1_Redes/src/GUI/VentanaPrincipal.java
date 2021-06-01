@@ -25,14 +25,18 @@ public class VentanaPrincipal extends JFrame {
 
     public VentanaPrincipal() throws HeadlessException {
         super("TFTP");
-        Cliente cliente = Cliente.getInstance();
-        this.setSize(new Dimension(800, 700));
-        this.setLayout(null);
-        this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-        this.setResizable(false);
-        this.init();
-        this.setVisible(true);
+        try {
+            Cliente cliente = Cliente.getInstance();
+            this.setSize(new Dimension(800, 700));
+            this.setLayout(null);
+            this.setLocationRelativeTo(null);
+            this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+            this.setResizable(false);
+            this.init();
+            this.setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//constructor
 
     private void init() {

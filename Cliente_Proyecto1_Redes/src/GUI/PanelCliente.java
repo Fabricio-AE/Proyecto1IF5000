@@ -103,7 +103,7 @@ public class PanelCliente extends JPanel implements ActionListener, MouseListene
                 System.out.println("Estoy enviando...");
                 ClientConnection clientConnection = ClientConnection.getInstance();
                 clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "nueva imagen"));
-                clientConnection.enviarImagen(this.cliente.getImagen().getPartes());
+                clientConnection.enviarImagen(this.cliente.getImagen().getPartes(), 1);
                 
             }else if(ae.getSource() == this.jbtnImagenesRecibidas){
                 ClientConnection clientConnection = ClientConnection.getInstance();

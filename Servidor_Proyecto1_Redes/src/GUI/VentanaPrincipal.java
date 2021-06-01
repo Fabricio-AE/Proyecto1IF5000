@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 
 import Domain.Server;
 import Server.MyServer;
+import Utility.Variables;
 
 public class VentanaPrincipal extends JPanel {
 
@@ -30,20 +31,16 @@ public class VentanaPrincipal extends JPanel {
 	}// constructor
 
 	public void init() {
-		/*
-		this.jlblIpServer=new JLabel(this.myServer.getIpServer());
-		this.jlblIpServer.setBounds(150,150,200,30);
-		this.add(this.jlblIpServer);*/
 		
-		Panel panel = new Panel("Server");
-		this.add(panel);
+		this.jlblIpServer=new JLabel(this.myServer.getIpServer()+":"+Variables.PORTNUMBER);
+		this.jlblIpServer.setBounds(150,150,200,30);
+		this.add(this.jlblIpServer);
 		
 		
 	}//init
 	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		/*this.admin.draw(g);*/
 		this.repaint();
 	}
 

@@ -5,6 +5,7 @@
  */
 package Client;
 
+import Domain.Cliente;
 import Domain.Imagen;
 import Domain.ParteImagen;
 import Domain.Servidor;
@@ -28,6 +29,7 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 
@@ -107,35 +109,62 @@ public class ClientConnection extends Thread {
         String opcion = element.getChild("accion").getValue();
         System.out.println("Opcion: " + opcion);
         switch (opcion) {
+            case "registrarse":
+                JOptionPane.showMessageDialog(null, element.getChild("respuesta").getValue());
+                break;
+                
+            case "iniciar sesion":
+                JOptionPane.showMessageDialog(null, element.getChild("respuesta").getValue());
+                break;
+            
             case "listar imagenes":
                 this.listarImagenes(element);
                 break;
 
             case "ver imagen":
+                Servidor servidor = Servidor.getInstance();
+                servidor.getImagen().getPartes().clear();
                 this.verImagen(element);
+                break;
+                
+            case "borrar partes":
+                Cliente cliente = Cliente.getInstance();
+                cliente.getImagen().getPartes().clear();
+                break;
+            case "parte de imagen":
+                this.insertarParteImagen(element);
                 break;
         }//switch
 
     }//identificarAccion
+    
+    public void registrarse(String nombre, String contrasenia){
+        Element msg = new Element("msg");
+        Conversiones.anadirAccion(msg, "registrar usuario");
+        
+        Element eNombre = new Element("nombre");
+        eNombre.addContent(nombre);
+        msg.addContent(eNombre);
+        
+        Element eContrasenia = new Element("contrasenia");
+        eContrasenia.addContent(contrasenia);
+        msg.addContent(eContrasenia);
+        
+        this.enviar(Conversiones.xmlToString(msg));
+    }//registrarse
+    
 
-    public BufferedImage convertirImagen(Image img) {
-        BufferedImage bufferedImage = new BufferedImage(img.getWidth(null),
-                img.getHeight(null),
-                BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D bGr = bufferedImage.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        return bufferedImage;
-    }//convertirImagen
-
-    public void enviarImagen(ArrayList<ParteImagen> partes) throws IOException, InterruptedException {
+    public void enviarImagen(ArrayList<ParteImagen> partes, int opc) throws IOException, InterruptedException {
 
         for (int i = 0; i < partes.size(); i++) {
             Element element = new Element("Image");
+            
+            Element eOpc = new Element("opc");
+            eOpc.addContent(opc+"");
+            
+            element.addContent(eOpc);
 
-            BufferedImage img = this.convertirImagen(partes.get(i).getImagen());
+            BufferedImage img = Conversiones.convertirImagen(partes.get(i).getImagen());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(img, "png", baos);
             baos.flush();
@@ -148,7 +177,7 @@ public class ClientConnection extends Thread {
             element.addContent(eEncodedImage);
 
             Element eIdParte = new Element("id");
-            eIdParte.addContent(i + "");
+            eIdParte.addContent(partes.get(i).getId() + "");
             element.addContent(eIdParte);
 
             Element ePosX = new Element("posX");
@@ -165,7 +194,7 @@ public class ClientConnection extends Thread {
 
     }//enviarImagen
 
-    public void listarImagenes(Element element) {
+    public void listarImagenes(Element element) throws IOException {
         ArrayList<String> imagenes = new ArrayList<>();
         for (int i = 0; i < element.getChildren("imagen").size(); i++) {
             Element e = (Element) element.getChildren("imagen").get(i);
@@ -174,6 +203,23 @@ public class ClientConnection extends Thread {
         Servidor servidor = Servidor.getInstance();
         servidor.setImagenes(imagenes);
     }//listarImagenes
+
+    public void insertarParteImagen(Element accion) throws IOException {
+        int id = Integer.parseInt(accion.getChild("id").getValue());
+        int x = Integer.parseInt(accion.getChild("posX").getValue());
+        int y = Integer.parseInt(accion.getChild("posY").getValue());
+        Image img = this.cargarImagen(accion.getChild("encodedImage").getValue());
+        Cliente cliente = Cliente.getInstance();
+        cliente.agregarParteImagen(new ParteImagen(id, x, y, img));
+    }// insertarParteImagen
+
+    public Image cargarImagen(String encodedImage) throws IOException {
+        byte[] bytes = Base64.getDecoder().decode(encodedImage);
+        BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(bytes));
+        Image tmp = bufferedImage.getScaledInstance(bufferedImage.getWidth(), bufferedImage.getHeight(),
+                Image.SCALE_SMOOTH);
+        return tmp;
+    }// cargarImagenPersonaje
 
     public void verImagen(Element element) throws IOException {
         Servidor servidor = Servidor.getInstance();

@@ -25,48 +25,41 @@ public class Cliente {
 		this.id = id;
 		this.nombre = nombre;
 		this.contrasenia = contrasenia;
-		this.imagen = new Imagen(null);
+		this.imagen = new Imagen();
 	}// constructor
 
-	public void draw(Graphics g) {
-		g.drawRect(19, 59, 351, 351);
-		if (this.imagen != null) {
-			if (!this.imagen.getPartes().isEmpty()) {
-				this.imagen.draw(g);
-			} // if
-		} // if
-	}// draw
-
-	public void agregarParteImagen(ParteImagen img) throws IOException {
+	public void agregarParteImagen(ParteImagen img, int opc) throws IOException {
 		this.imagen.getPartes().add(img);
+
 		if (this.imagen.getPartes().size() == 25) {// cambiar el 25 por una variable en Variables
-			Collections.sort(this.imagen.getPartes(), new OrdenarArray());
 			int width = 350, height = 350;
-			int partes = 5;//recibir por parametro a la hora de enviar las partes
+			int partes = 5;// recibir por parametro a la hora de enviar las partes
 			int cont = 0;
+
+			ClienteData clienteData = new ClienteData();
+			if (opc == 1) {
+				clienteData.guardarImagenDesordenada(this.id, this.imagen, width, height, partes);
+				Collections.sort(this.imagen.getPartes(), new OrdenarArray());
+			}
+
 			for (int i = 0; i < partes; i++) {
 				for (int j = 0; j < partes; j++) {
 					int posX = j * (width / partes), posY = i * (height / partes);
 					this.imagen.getPartes().get(cont).setPosX(posX + 20);
-					this.imagen.getPartes().get(cont).setPosY(posY + 60);
+					this.imagen.getPartes().get(cont).setPosY(posY + 90);
 					cont++;
 				} // for j
 			} // for i
-			ClienteData clienteData = new ClienteData();
-			clienteData.guardarImagen(this.id, this.imagen,width , height, partes);
+			
+			if (opc == 1)
+				clienteData.guardarImagen(this.id, this.imagen, width, height, partes);
 		} // if
 	}// agregarParteImagen
 
 	public ArrayList<String> verImagenes() {
 		ClienteData clienteData = new ClienteData();
 		return clienteData.verImagenes(this.id);
-	}//verImagenes
-
-	public void mousePressed(MouseEvent ev) {
-		if (this.imagen != null) {
-			this.imagen.mousePressed(ev);
-		} // if
-	}// mouseDragged
+	}// verImagenes
 
 	/* setters and getters */
 	public Imagen getImagen() {
@@ -108,7 +101,5 @@ public class Cliente {
 	public void setArchivos(ArrayList<String> archivos) {
 		this.archivos = archivos;
 	}
-	
-	
 
 }// end class
