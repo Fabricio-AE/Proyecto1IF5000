@@ -41,7 +41,6 @@ public class ConsultaCliente extends Thread {
 		this.send = new PrintStream(this.socket.getOutputStream());
 		this.receive = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
 		this.conectado = true;
-		//this.cliente = Cliente.getInstance();
 		//this.cliente.setImagen(new Imagen());
 	}// constructor
 
@@ -56,11 +55,14 @@ public class ConsultaCliente extends Thread {
 			e.printStackTrace();
 		} catch (JDOMException e) {
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}// run
 
-	public void escuchando() throws IOException, JDOMException {
+	public void escuchando() throws IOException, JDOMException, InterruptedException {
 		System.out.println("Escuchando...");
 		this.accion = this.receive.readLine();
 		this.protocolo();
@@ -70,7 +72,7 @@ public class ConsultaCliente extends Thread {
 		this.send.println(element);
 	}// enviar
 
-	public void protocolo() throws JDOMException, IOException {
+	public void protocolo() throws JDOMException, IOException, InterruptedException {
 		// System.out.println(this.accion);
 		Element accion = Conversiones.stringToXML(this.accion);
 		System.out.println("Opcion recibida: " + accion.getChild("accion").getValue());
@@ -80,9 +82,13 @@ public class ConsultaCliente extends Thread {
 			this.conectado = false;
 			this.socket.close();
 			break;
-
+			
+		case "registrar usuario":
+			this.registrarUsuario(accion);
+			break;
+			
 		case "iniciar sesion":
-			this.cliente = new Cliente("1", "Fabricio", "123");
+			this.iniciarSesion(accion);
 			break;
 
 		case "nueva imagen":
@@ -102,39 +108,76 @@ public class ConsultaCliente extends Thread {
 			break;
 			
 		case "ver imagen":
+			this.cliente.getImagen().getPartes().clear();
 			this.verImagen(accion);
+			this.cliente.getImagen().getPartes().clear();
 			
+			break;
+			
+		case "obtener imagen":
+			this.enviarImagen();
 			break;
 		default:
 			break;
 		}// switch
 	}// protocolo
+	
+	public void registrarUsuario(Element element) {
+		ClienteData clienteData = new ClienteData();
+		String resultado = clienteData.registrarUsuario(element.getChild("nombre").getValue()
+				, element.getChild("contrasenia").getValue());
+		Element msg = new Element("msg");
+		
+		Element respuesta = new Element("respuesta");
+		respuesta.addContent(resultado);
+		
+		msg.addContent(respuesta);
+		
+		this.enviar(Conversiones.anadirAccion(msg, "registrarse"));
+		
+	}//registrarUsuario
+	
+	public void iniciarSesion(Element element) throws IOException {
+		ClienteData clienteData = new ClienteData();
+		String [] resultado = clienteData.iniciarSesion(element.getChild("nombre").getValue()
+				, element.getChild("contrasenia").getValue());
+		System.out.println(element.getChild("nombre").getValue());
+		
+		if (resultado[0].equals("SESION INICIADA CON EXITO")) {
+			this.cliente = new Cliente(resultado[1]
+					, element.getChild("nombre").getValue()
+					, element.getChild("contrasenia").getValue());
+		}
+		
+		Element msg = new Element("msg");
+		
+		Element respuesta = new Element("respuesta");
+		respuesta.addContent(resultado[0]);
+		
+		msg.addContent(respuesta);
+		
+		this.enviar(Conversiones.anadirAccion(msg, "registrarse"));
+	}
 
-	public void insertarParteImagen(Element accion) throws IOException {
-		int id = Integer.parseInt(accion.getChild("id").getValue());
-		int x = Integer.parseInt(accion.getChild("posX").getValue());
-		int y = Integer.parseInt(accion.getChild("posY").getValue());
-		Image img = this.cargarImagen(accion.getChild("encodedImage").getValue());
-
-		this.cliente.agregarParteImagen(new ParteImagen(id, x, y, img));
+	public void insertarParteImagen(Element element) throws IOException {
+		int id = Integer.parseInt(element.getChild("id").getValue());
+		int x = Integer.parseInt(element.getChild("posX").getValue());
+		int y = Integer.parseInt(element.getChild("posY").getValue());
+		int opc = Integer.parseInt(element.getChild("opc").getValue());
+		Image img = this.cargarImagen(element.getChild("encodedImage").getValue());
+		
+		this.cliente.agregarParteImagen(new ParteImagen(id, x, y, img), opc);
+		System.out.println("opcccccccccccccc: "+this.cliente.getImagen().getPartes().size());
 	}// insertarParteImagen
+	
+	public void obtenerImagen(Element element) throws IOException {
+		int id = Integer.parseInt(element.getChild("id").getValue());
+		int x = Integer.parseInt(element.getChild("posX").getValue());
+		int y = Integer.parseInt(element.getChild("posY").getValue());
+		Image img = this.cargarImagen(element.getChild("encodedImage").getValue());
 
-	public void registrarUsuario(Element element) throws JDOMException, IOException {
-		/*
-		 * Usuario usuario = Conversiones.xmlToUsuario(element); UsuarioBusiness
-		 * usuarioBusiness = new UsuarioBusiness(); Element respuesta = new
-		 * Element("accion");
-		 * 
-		 * if (usuarioBusiness.buscarUsuario(usuario.getNombre()) == null) {
-		 * System.out.println(usuario.toString());
-		 * usuarioBusiness.registrarUsuario(usuario);
-		 * 
-		 * this.enviar(Conversiones.anadirAccion(respuesta, "Registrado"));
-		 * 
-		 * } else { System.out.println("No registrado");
-		 * this.enviar(Conversiones.anadirAccion(respuesta, "NoRegistrado")); }
-		 */
-	}// registrarUsuario
+		this.cliente.agregarParteImagen(new ParteImagen(id, x, y, img), 2);
+	}//obtenerImagen
 
 	public Image cargarImagen(String encodedImage) throws IOException {
 		byte[] bytes = Base64.getDecoder().decode(encodedImage);
@@ -160,10 +203,10 @@ public class ConsultaCliente extends Thread {
 	public void verImagen(Element element1) throws IOException {
 		Element element = new Element("Imagen");
 		ClienteData clienteData = new ClienteData();
-		
-		System.out.println(element1.getChild("nombre").getValue());
 
         BufferedImage img = clienteData.verImagen(this.cliente.getId(), element1.getChild("nombre").getValue());
+        this.cliente.setImagen(new Imagen());
+        this.cliente.getImagen().asignarImagen(Conversiones.convertirImagen(img));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(img, "png", baos);
         baos.flush();
@@ -179,14 +222,42 @@ public class ConsultaCliente extends Thread {
         this.send.println(Conversiones.xmlToString(element));
 	}//verImagen
 
-	public boolean comprobarUsuarioYaActivo(Usuario usrTemp) {
-		/*
-		 * Administrador admin = Administrador.getInstance(); for (int i = 0; i <
-		 * admin.getUsuariosActivos().size(); i++) { if
-		 * (admin.getUsuariosActivos().get(i).getNombre().equals(usrTemp.getNombre())) {
-		 * return true; } } // for i
-		 */
-		return false;
-	}// comprobarInicioDeSesion
+	public void enviarImagen() throws IOException, InterruptedException {
+		
+		this.send.println(Conversiones.anadirAccion(new Element("msg"), "borrar partes"));
+
+        for (int i = 0; i < this.cliente.getImagen().getPartes().size(); i++) {
+            Element element = new Element("Image");
+
+            BufferedImage img = Conversiones.convertirImagen(this.cliente.getImagen().getPartes().get(i).getImagen());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(img, "png", baos);
+            baos.flush();
+            String encodedImage = Base64.getEncoder().encodeToString(baos.toByteArray());
+            baos.close();
+            Conversiones.anadirAccion(element, "parte de imagen");
+
+            Element eEncodedImage = new Element("encodedImage");
+            eEncodedImage.addContent(encodedImage);
+            element.addContent(eEncodedImage);
+
+            Element eIdParte = new Element("id");
+            eIdParte.addContent(this.cliente.getImagen().getPartes().get(i).getId() + "");
+            element.addContent(eIdParte);
+            
+
+            Element ePosX = new Element("posX");
+            ePosX.addContent(this.cliente.getImagen().getPartes().get(i).getPosX() + "");
+            element.addContent(ePosX);
+
+            Element ePosY = new Element("posY");
+            ePosY.addContent(this.cliente.getImagen().getPartes().get(i).getPosY() + "");
+            element.addContent(ePosY);
+
+            this.send.println(Conversiones.xmlToString(element));
+            Thread.sleep(100);
+        }//for i
+
+    }//enviarImagen
 
 }// end class

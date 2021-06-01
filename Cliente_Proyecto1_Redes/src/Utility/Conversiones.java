@@ -1,5 +1,7 @@
 package Utility;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -39,17 +41,18 @@ public class Conversiones {
         element.addContent(eAccion);
 
         return xmlToString(element);
-    }// anadirAccion
+    }// anadirAccion    
+    
+    public static BufferedImage convertirImagen(Image img) {
+        BufferedImage bufferedImage = new BufferedImage(img.getWidth(null),
+                img.getHeight(null),
+                BufferedImage.TYPE_INT_ARGB);
 
-    public static String enviarPersonaje(/*Usuario usuario*/) throws IOException {
-        /*BufferedImage img = usuario.getJugador().getImage();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(img, "png", baos);
-        baos.flush();
-        String encodedImage = Base64.getEncoder().encodeToString(baos.toByteArray());
-        baos.close(); // should be inside a finally block
+        Graphics2D bGr = bufferedImage.createGraphics();
+        bGr.drawImage(img, 0, 0, null);
+        bGr.dispose();
 
-        */return /*encodedImage*/"";
-    }// enviarPersonaje
+        return bufferedImage;
+    }//convertirImagen
 
 } // fin clase

@@ -21,6 +21,8 @@ import java.awt.image.CropImageFilter;
 import java.awt.image.FilteredImageSource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -35,7 +37,6 @@ import org.jdom.Element;
  */
 public class PanelServidor extends JPanel implements ActionListener, MouseListener {
 
-    //private static PanelServidor instance = null;
     private Border border;
     private JButton jbtnListarImagenes, jbtnVer, jbtnObtenerImagen;
     private JComboBox<String> jcbImagenes;
@@ -43,14 +44,18 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
 
     public PanelServidor(String titulo) {
         super();
-        this.servidor = Servidor.getInstance();
-        this.setBounds(400, 100, 390, 560);
-        this.setLayout(null);
-        this.border = new TitledBorder(titulo);
-        this.setBorder(this.border);
-        this.init();
-        this.setVisible(true);
-        this.addMouseListener(this);
+        try {
+            this.servidor = Servidor.getInstance();
+            this.setBounds(400, 100, 390, 560);
+            this.setLayout(null);
+            this.border = new TitledBorder(titulo);
+            this.setBorder(this.border);
+            this.init();
+            this.setVisible(true);
+            this.addMouseListener(this);
+        } catch (IOException ex) {
+            Logger.getLogger(PanelServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//constructor
 
     private void init() {
@@ -108,6 +113,13 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
                 clientConnection.enviar(Conversiones.anadirAccion(msg, "ver imagen"));
                 Thread.sleep(500);
                 this.repaint();
+            }else if(ae.getSource() == this.jbtnObtenerImagen){
+                ClientConnection clientConnection = ClientConnection.getInstance();
+                clientConnection.enviarImagen(this.servidor.getImagen().getPartes(), 2);
+                clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "obtener imagen"));
+                
+                
+                Thread.sleep(500);
             }
         } catch (IOException ex) {
             ex.printStackTrace();

@@ -7,6 +7,7 @@ package Domain;
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -19,10 +20,11 @@ public class Servidor {
     private ArrayList<String> imagenes;
     private Imagen imagen;
 
-    private Servidor() {
+    private Servidor() throws IOException {
+        this.imagen = new Imagen();
     }//constructor
 
-    public static Servidor getInstance() {
+    public static Servidor getInstance() throws IOException {
         if (instance == null) {
             instance = new Servidor();
         }

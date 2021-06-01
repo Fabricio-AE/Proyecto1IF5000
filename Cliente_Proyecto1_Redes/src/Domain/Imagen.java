@@ -1,5 +1,6 @@
 package Domain;
 
+import Utility.Conversiones;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
@@ -12,46 +13,25 @@ import javax.swing.JPanel;
 import java.awt.Component;
 import java.awt.Graphics2D;
 
-public class Imagen{
+public class Imagen {
 
     private boolean isSelected;
-    private Image imagen;
     private ArrayList<ParteImagen> partes;
 
-    public Imagen(Image image) throws IOException {
-        this.imagen = image;
-        this.isSelected = false;
-        this.partes = new ArrayList<>();
-    }//constructor
-    
     public Imagen() throws IOException {
-        /*this.imagen = null;*/
         this.isSelected = false;
         this.partes = new ArrayList<>();
     }//constructor
-    
-    public BufferedImage convertirImagen(Image img) {
-        BufferedImage bufferedImage = new BufferedImage(img.getWidth(null),
-                img.getHeight(null),
-                BufferedImage.TYPE_INT_ARGB);
 
-        Graphics2D bGr = bufferedImage.createGraphics();
-        bGr.drawImage(img, 0, 0, null);
-        bGr.dispose();
-
-        return bufferedImage;
-    }//convertirImagen
-    
     public void asignarImagen(Image img) throws IOException {
         int width = 350, height = 350;
         int partes = 5;
         Component comp = new Component() {
         };
-        
-        BufferedImage bi = convertirImagen(img);
-        
+
+        BufferedImage bi = Conversiones.convertirImagen(img);
+
         Image tmp = bi.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        this.imagen = tmp;
 
         int idImagen = 0;
         for (int i = 0; i < partes; i++) {
@@ -62,7 +42,7 @@ public class Imagen{
                         new CropImageFilter(posX, posY, width / partes, height / partes)));
 
                 this.partes.add(
-                        new ParteImagen(idImagen++, posX+20, posY+90, imagePart));
+                        new ParteImagen(idImagen++, posX + 20, posY + 90, imagePart));
             }//for j
         }//for i
 
@@ -79,6 +59,17 @@ public class Imagen{
 
             this.partes.get(i).setPosX(posXSelected);
             this.partes.get(i).setPosY(posYSelected);
+
+            ParteImagen parteTemp = this.partes.get(j);
+            int idTempj = this.partes.get(j).getId();
+            int idTempi = this.partes.get(i).getId();
+
+            this.partes.set(j, this.partes.get(i));
+            this.partes.set(i, parteTemp);
+
+            this.partes.get(j).setId(idTempi);
+            this.partes.get(i).setId(idTempj);
+
         }//for i
 
     }//dispersarPartes
@@ -109,9 +100,21 @@ public class Imagen{
 
                     this.partes.get(i).setPosX(posXSelected);
                     this.partes.get(i).setPosY(posYSelected);
-
+                    
                     this.partes.get(j).setPressedId(0);
                     this.isSelected = false;
+
+                    ParteImagen parteTemp = this.partes.get(j);
+                    int idTempj = this.partes.get(j).getId();
+                    int idTempi = this.partes.get(i).getId();
+
+                    this.partes.set(j, this.partes.get(i));
+                    this.partes.set(i, parteTemp);
+
+                    this.partes.get(j).setId(idTempi);
+                    this.partes.get(i).setId(idTempj);
+
+                    
                 }//else if
             }//if caja de colisiones
         }//for i
@@ -128,14 +131,6 @@ public class Imagen{
     }//isActive
 
     /*setters and getters*/
-    public Image getImagen() {
-        return imagen;
-    }
-
-    public void setImagen(Image imagen) {
-        this.imagen = imagen;
-    }
-
     public ArrayList<ParteImagen> getPartes() {
         return partes;
     }

@@ -28,13 +28,14 @@ import org.jdom.Element;
  *
  * @author Fabricio
  */
-public class PanelPrincipal extends JPanel implements ActionListener{
-    private JLabel jlblServidor ,jlblUsuario, jlblContrasenia, jlblPuerto;
-    private JTextField jtfServidor ,jtfUsuario, jtfContrasenia, jtfPuerto;
+public class PanelPrincipal extends JPanel implements ActionListener {
+
+    private JLabel jlblServidor, jlblUsuario, jlblContrasenia, jlblPuerto;
+    private JTextField jtfServidor, jtfUsuario, jtfContrasenia, jtfPuerto;
     private JButton jbtnConectar, jbtnRegistrarse;
     private Container containerSesion;
     private Border border;
-    
+
     public PanelPrincipal(String titulo) {
         super();
         this.setSize(790, 100);
@@ -43,78 +44,95 @@ public class PanelPrincipal extends JPanel implements ActionListener{
         this.setBorder(this.border);
         this.init();
         this.setVisible(true);
-        
+
     }//constructor
-    
-    private void init(){
-    	/*Contenedor sesion*/
-    	
-    	this.containerSesion = new Container();
-    	this.containerSesion.setBounds(0, 0, 790, 300);
-    	this.containerSesion.setBackground(new Color(1,0,0));
-    	
+
+    private void init() {
+        /*Contenedor sesion*/
+
+        this.containerSesion = new Container();
+        this.containerSesion.setBounds(0, 0, 790, 300);
+        this.containerSesion.setBackground(new Color(1, 0, 0));
+
         this.jlblServidor = new JLabel("Servidor");
         this.jlblServidor.setBounds(Variables.ESPACIO, 10, 110, 50);
         this.containerSesion.add(this.jlblServidor);
-        
+
         this.jtfServidor = new JTextField();
         this.jtfServidor.setBounds(Variables.ESPACIO, 50, 110, 20);
         this.containerSesion.add(this.jtfServidor);
-        
+
         this.jlblUsuario = new JLabel("Nombre de usuario");
-        this.jlblUsuario.setBounds(Variables.ESPACIO*15, 10, 110, 50);
+        this.jlblUsuario.setBounds(Variables.ESPACIO * 15, 10, 110, 50);
         this.containerSesion.add(this.jlblUsuario);
-        
+
         this.jtfUsuario = new JTextField();
-        this.jtfUsuario.setBounds(Variables.ESPACIO*15, 50, 110, 20);
+        this.jtfUsuario.setBounds(Variables.ESPACIO * 15, 50, 110, 20);
         this.containerSesion.add(this.jtfUsuario);
-        
+
         this.jlblContrasenia = new JLabel("Contraseña");
-        this.jlblContrasenia.setBounds(Variables.ESPACIO*29, 10, 110, 50);
+        this.jlblContrasenia.setBounds(Variables.ESPACIO * 29, 10, 110, 50);
         this.containerSesion.add(this.jlblContrasenia);
-        
+
         this.jtfContrasenia = new JTextField();
-        this.jtfContrasenia.setBounds(Variables.ESPACIO*29, 50, 110, 20);
+        this.jtfContrasenia.setBounds(Variables.ESPACIO * 29, 50, 110, 20);
         this.containerSesion.add(this.jtfContrasenia);
-        
+
         this.jlblPuerto = new JLabel("Puerto");
-        this.jlblPuerto.setBounds(Variables.ESPACIO*44, 10, 110, 50);
+        this.jlblPuerto.setBounds(Variables.ESPACIO * 44, 10, 110, 50);
         this.containerSesion.add(this.jlblPuerto);
-        
+
         this.jtfPuerto = new JTextField();
-        this.jtfPuerto.setBounds(Variables.ESPACIO*44, 50, 110, 20);
+        this.jtfPuerto.setBounds(Variables.ESPACIO * 44, 50, 110, 20);
         this.containerSesion.add(this.jtfPuerto);
-        
+
         this.jbtnConectar = new JButton("Conectar");
-        this.jbtnConectar.setBounds(Variables.ESPACIO*56, 40, 105, 35);
+        this.jbtnConectar.setBounds(Variables.ESPACIO * 56, 40, 105, 35);
         this.jbtnConectar.addActionListener(this);
         this.containerSesion.add(this.jbtnConectar);
-        
+
         this.jbtnRegistrarse = new JButton("Registrarse");
-        this.jbtnRegistrarse.setBounds(Variables.ESPACIO*68-3, 40, 105, 35);
+        this.jbtnRegistrarse.setBounds(Variables.ESPACIO * 68 - 3, 40, 105, 35);
         this.jbtnRegistrarse.addActionListener(this);
         this.containerSesion.add(this.jbtnRegistrarse);
-        
+
         this.add(this.containerSesion);
-        
+
         /*Contenedor*/
-        
     }//init
 
     @Override
     public void actionPerformed(ActionEvent ae) {
-        if(ae.getSource() == this.jbtnConectar 
-                && !this.jtfServidor.getText().isEmpty()
-                /*&& !this.jtfPuerto.getText().isEmpty()*/){
-            try {
+        try {
+            if (ae.getSource() == this.jbtnConectar
+                    && !this.jtfServidor.getText().isEmpty()
+                    && !this.jtfUsuario.getText().isEmpty()
+                    && !this.jtfContrasenia.getText().isEmpty()
+                    && !this.jtfPuerto.getText().isEmpty()) {
+
                 Variables.IPSERVER = this.jtfServidor.getText();
+                Variables.PORTNUMBER = Integer.parseInt(this.jtfPuerto.getText());
                 System.out.println(Variables.IPSERVER);
                 ClientConnection cli = ClientConnection.getInstance();
-                cli.enviar(Conversiones.anadirAccion(new Element("coneccion"), "iniciar sesion"));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }//try-catch
-        }//if
+                Element msg = new Element("msg");
+                Conversiones.anadirAccion(msg, "iniciar sesion");
+                
+                Element nombre = new Element("nombre");
+                nombre.addContent(this.jtfUsuario.getText());
+                msg.addContent(nombre);
+                
+                Element contrasenia = new Element("contrasenia");
+                contrasenia.addContent(this.jtfContrasenia.getText());
+                msg.addContent(contrasenia);
+                
+                cli.enviar(Conversiones.xmlToString(msg));
+
+            }else if(ae.getSource() == this.jbtnRegistrarse){
+                VentanaRegistrar ventanaRegistrar = new VentanaRegistrar();
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }//try-catch
     }//actionPerformed
-    
+
 }//end class
