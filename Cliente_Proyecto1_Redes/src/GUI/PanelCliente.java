@@ -59,20 +59,20 @@ public class PanelCliente extends JPanel implements ActionListener, MouseListene
 
     private void init() {
         this.jbtnBuscarImagen = new JButton("Buscar imagen");
-        this.jbtnBuscarImagen.setBounds(this.getWidth()/2-60, 10, 120, 30);
+        this.jbtnBuscarImagen.setBounds(this.getWidth() / 2 - 60, 10, 120, 30);
         this.jbtnBuscarImagen.addActionListener(this);
         this.add(this.jbtnBuscarImagen);
-        
+
         this.jbtnEnviarImagen = new JButton("Enviar");
-        this.jbtnEnviarImagen.setBounds(this.getWidth()/2-125, 500, 120, 30);
+        this.jbtnEnviarImagen.setBounds(this.getWidth() / 2 - 125, 500, 120, 30);
         this.jbtnEnviarImagen.addActionListener(this);
         this.add(this.jbtnEnviarImagen);
-        
+
         this.jbtnImagenesRecibidas = new JButton("Ver recibidas");
-        this.jbtnImagenesRecibidas.setBounds(this.getWidth()/2+5, 500, 120, 30);
+        this.jbtnImagenesRecibidas.setBounds(this.getWidth() / 2 + 5, 500, 120, 30);
         this.jbtnImagenesRecibidas.addActionListener(this);
         this.add(this.jbtnImagenesRecibidas);
-        
+
     }//init
 
     public void paintComponent(Graphics g) {
@@ -84,10 +84,14 @@ public class PanelCliente extends JPanel implements ActionListener, MouseListene
     @Override
     public void actionPerformed(ActionEvent ae) {
         try {
-            if (ae.getSource() == this.jbtnBuscarImagen) {
+            Cliente cliente = Cliente.getInstance();
+            if (ae.getSource() == this.jbtnBuscarImagen
+                    && !cliente.getNombre().equals("-1")) {
+
                 this.jfcChooser = new JFileChooser();
                 FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imagen", "png", "jpg", "bmp");
                 this.jfcChooser.setFileFilter(filtro);
+                this.jfcChooser.setCurrentDirectory(new File("../cliente")); 
                 int opcion = this.jfcChooser.showOpenDialog(this);
                 if (opcion == JFileChooser.APPROVE_OPTION) {
                     String directorioImagen = this.jfcChooser.getSelectedFile().getAbsolutePath();
@@ -97,19 +101,31 @@ public class PanelCliente extends JPanel implements ActionListener, MouseListene
                     this.repaint();
                     this.cliente.getImagen().dispersarPartes();
                 } //if
-                
-            }else if(ae.getSource() == this.jbtnEnviarImagen 
-                    && !ClientConnection.isNull()){
+
+            } else if (ae.getSource() == this.jbtnEnviarImagen
+                    && !ClientConnection.isNull() && !Cliente.isNull()
+                    && !cliente.getNombre().equals("-1")) {
                 System.out.println("Estoy enviando...");
                 ClientConnection clientConnection = ClientConnection.getInstance();
                 clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "nueva imagen"));
                 clientConnection.enviarImagen(this.cliente.getImagen().getPartes(), 1);
-                
-            }else if(ae.getSource() == this.jbtnImagenesRecibidas){
-                ClientConnection clientConnection = ClientConnection.getInstance();
-                clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "ver imagenes"));
+
+            } else if (ae.getSource() == this.jbtnImagenesRecibidas
+                    && !cliente.getNombre().equals("-1")) {
+                this.jfcChooser = new JFileChooser();
+                FileNameExtensionFilter filtro = new FileNameExtensionFilter("Imagen", "png", "jpg", "bmp");
+                this.jfcChooser.setFileFilter(filtro);
+                this.jfcChooser.setCurrentDirectory(new File("../cliente/"+cliente.getNombre()));
+                int opcion = this.jfcChooser.showOpenDialog(this);
+                if (opcion == JFileChooser.APPROVE_OPTION) {
+                    String directorioImagen = this.jfcChooser.getSelectedFile().getAbsolutePath();
+                    Imagen img = new Imagen();
+                    img.asignarImagen(ImageIO.read(new File(directorioImagen)));
+                    this.cliente.setImagen(img);
+                    this.repaint();
+                } //if
             }
-                
+
         } catch (IOException ex) {
             ex.printStackTrace();
         } catch (InterruptedException ex) {
@@ -119,7 +135,7 @@ public class PanelCliente extends JPanel implements ActionListener, MouseListene
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        
+
     }
 
     @Override
@@ -129,17 +145,17 @@ public class PanelCliente extends JPanel implements ActionListener, MouseListene
 
     @Override
     public void mouseReleased(MouseEvent me) {
-        
+
     }
 
     @Override
     public void mouseEntered(MouseEvent me) {
-        
+
     }
 
     @Override
     public void mouseExited(MouseEvent me) {
-        
+
     }
 
 }//end class

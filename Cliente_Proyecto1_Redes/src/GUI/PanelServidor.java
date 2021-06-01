@@ -6,6 +6,7 @@
 package GUI;
 
 import Client.ClientConnection;
+import Domain.Cliente;
 import Domain.Imagen;
 import Domain.ParteImagen;
 import Domain.Servidor;
@@ -67,7 +68,7 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
         this.jcbImagenes = new JComboBox<>();
         this.jcbImagenes.setBounds(this.getWidth() / 2 - 60, 50, 120, 30);
         this.add(this.jcbImagenes);
-        
+
         this.jbtnVer = new JButton("Ver");
         this.jbtnVer.setBounds(this.getWidth() / 2 + 65, 50, 60, 30);
         this.jbtnVer.addActionListener(this);
@@ -79,15 +80,15 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
         this.add(this.jbtnObtenerImagen);
 
     }//init
-    
-    private void initJComboBox(){
+
+    private void initJComboBox() {
         this.jcbImagenes.removeAllItems();
         ArrayList<String> imagenes = this.servidor.getImagenes();
         for (int i = 0; i < imagenes.size(); i++) {
             this.jcbImagenes.addItem(imagenes.get(i));
         }//for i
     }//initJComboBox
-    
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         this.servidor.draw(g);
@@ -97,28 +98,32 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
     @Override
     public void actionPerformed(ActionEvent ae) {
         try {
-            if (ae.getSource() == this.jbtnListarImagenes) {
+            Cliente cliente = Cliente.getInstance();
+            if (ae.getSource() == this.jbtnListarImagenes
+                    && !cliente.getNombre().equals("-1")) {
+
                 ClientConnection clientConnection = ClientConnection.getInstance();
                 clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "ver imagenes"));
                 Thread.sleep(500);
                 this.initJComboBox();
-            }else if(ae.getSource() == this.jbtnVer){
+            } else if (ae.getSource() == this.jbtnVer
+                    && !cliente.getNombre().equals("-1")) {
                 ClientConnection clientConnection = ClientConnection.getInstance();
                 Element msg = new Element("msg");
-                
+
                 Element nombre = new Element("nombre");
-                nombre.addContent((String)this.jcbImagenes.getSelectedItem());
-                
+                nombre.addContent((String) this.jcbImagenes.getSelectedItem());
+
                 msg.addContent(nombre);
                 clientConnection.enviar(Conversiones.anadirAccion(msg, "ver imagen"));
                 Thread.sleep(500);
                 this.repaint();
-            }else if(ae.getSource() == this.jbtnObtenerImagen){
+            } else if (ae.getSource() == this.jbtnObtenerImagen
+                    && !cliente.getNombre().equals("-1")) {
                 ClientConnection clientConnection = ClientConnection.getInstance();
                 clientConnection.enviarImagen(this.servidor.getImagen().getPartes(), 2);
                 clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "obtener imagen"));
-                
-                
+
                 Thread.sleep(500);
             }
         } catch (IOException ex) {

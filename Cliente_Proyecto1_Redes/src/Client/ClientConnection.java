@@ -109,14 +109,22 @@ public class ClientConnection extends Thread {
         String opcion = element.getChild("accion").getValue();
         System.out.println("Opcion: " + opcion);
         switch (opcion) {
+            case "Cerrar":
+                this.online = false;
+                break;
+
             case "registrarse":
                 JOptionPane.showMessageDialog(null, element.getChild("respuesta").getValue());
                 break;
-                
+
             case "iniciar sesion":
                 JOptionPane.showMessageDialog(null, element.getChild("respuesta").getValue());
+                if (element.getChild("respuesta").getValue().equals("SESION INICIADA CON EXITO")) {
+                    Cliente cliente = Cliente.getInstance();
+                    cliente.setNombre(element.getChild("nombre").getValue());
+                }
                 break;
-            
+
             case "listar imagenes":
                 this.listarImagenes(element);
                 break;
@@ -126,7 +134,7 @@ public class ClientConnection extends Thread {
                 servidor.getImagen().getPartes().clear();
                 this.verImagen(element);
                 break;
-                
+
             case "borrar partes":
                 Cliente cliente = Cliente.getInstance();
                 cliente.getImagen().getPartes().clear();
@@ -137,31 +145,30 @@ public class ClientConnection extends Thread {
         }//switch
 
     }//identificarAccion
-    
-    public void registrarse(String nombre, String contrasenia){
+
+    public void registrarse(String nombre, String contrasenia) {
         Element msg = new Element("msg");
         Conversiones.anadirAccion(msg, "registrar usuario");
-        
+
         Element eNombre = new Element("nombre");
         eNombre.addContent(nombre);
         msg.addContent(eNombre);
-        
+
         Element eContrasenia = new Element("contrasenia");
         eContrasenia.addContent(contrasenia);
         msg.addContent(eContrasenia);
-        
+
         this.enviar(Conversiones.xmlToString(msg));
     }//registrarse
-    
 
     public void enviarImagen(ArrayList<ParteImagen> partes, int opc) throws IOException, InterruptedException {
 
         for (int i = 0; i < partes.size(); i++) {
             Element element = new Element("Image");
-            
+
             Element eOpc = new Element("opc");
-            eOpc.addContent(opc+"");
-            
+            eOpc.addContent(opc + "");
+
             element.addContent(eOpc);
 
             BufferedImage img = Conversiones.convertirImagen(partes.get(i).getImagen());

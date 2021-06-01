@@ -154,9 +154,13 @@ public class ConsultaCliente extends Thread {
 		Element respuesta = new Element("respuesta");
 		respuesta.addContent(resultado[0]);
 		
-		msg.addContent(respuesta);
+		Element nombre = new Element("nombre");
+		nombre.addContent(element.getChild("nombre").getValue()+resultado[1]);
 		
-		this.enviar(Conversiones.anadirAccion(msg, "registrarse"));
+		msg.addContent(respuesta);
+		msg.addContent(nombre);
+		
+		this.enviar(Conversiones.anadirAccion(msg, "iniciar sesion"));
 	}
 
 	public void insertarParteImagen(Element element) throws IOException {

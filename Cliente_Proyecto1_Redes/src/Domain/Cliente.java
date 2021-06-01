@@ -10,12 +10,12 @@ import java.util.Collections;
 public class Cliente {
 
     private static Cliente instance = null;
-    private String id, nombre, contrasenia;
+    private String nombre;
     private Imagen imagen;
 
     private Cliente() throws IOException {
         this.imagen = new Imagen();
-        this.id = "1";
+        this.nombre = "-1";
     }//constructor
 
     public static Cliente getInstance() throws IOException {
@@ -24,6 +24,10 @@ public class Cliente {
         }
         return instance;
     }//getInstance
+    
+    public static boolean isNull() {
+        return instance == null;
+    }//isNull
 
     public void agregarParteImagen(ParteImagen img) throws IOException {
         this.imagen.getPartes().add(img);
@@ -33,7 +37,7 @@ public class Cliente {
             int partes = 5;// recibir por parametro a la hora de enviar las partes
             int cont = 0;
             ClienteData clienteData = new ClienteData();
-            clienteData.guardarImagenDesordenada(this.id, this.imagen, width, height, partes);
+            clienteData.guardarImagenDesordenada(this.nombre, this.imagen, width, height, partes);
 
             Collections.sort(this.imagen.getPartes(), new OrdenarArray());
 
@@ -45,7 +49,7 @@ public class Cliente {
                     cont++;
                 } // for j
             } // for i
-            clienteData.guardarImagen(this.id, this.imagen, width, height, partes);
+            clienteData.guardarImagen(this.nombre, this.imagen, width, height, partes);
 
         } // if
     }// agregarParteImagen
@@ -74,28 +78,12 @@ public class Cliente {
         this.imagen = imagen;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getNombre() {
         return nombre;
     }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
-
-    public String getContrasenia() {
-        return contrasenia;
-    }
-
-    public void setContrasenia(String contrasenia) {
-        this.contrasenia = contrasenia;
     }
 
 }//end class
