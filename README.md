@@ -16,7 +16,8 @@ Pasos para la correcta ejecución del proyecto:
 3.  Una vez abierto, se debe comprobar que las bibliotecas estén incluidas, si no
     lo están, entonces se deben agregar. Para el caso del cliente, solo es necesario
     jdom.jar que se encuentra en la carpeta lib del proyecto. Por otra parte, el
-    servidor ocupa tanto jdom.jar como mssql-jdbc-9.2.1.jre8.jar.
+    servidor ocupa tanto jdom.jar como mssql-jdbc-9.2.1.jre8.jar que igualmente se
+    encuentran en la carpeta lib del proyecto.
     
 *******************Ejecución del proyecto y uso dentro de él*******************
 
