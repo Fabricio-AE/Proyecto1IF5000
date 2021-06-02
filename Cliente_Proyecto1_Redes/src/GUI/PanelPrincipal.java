@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
@@ -132,6 +133,7 @@ public class PanelPrincipal extends JPanel implements ActionListener {
             }
         } catch (IOException ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Servidor no encontrado");
         }//try-catch
     }//actionPerformed
 

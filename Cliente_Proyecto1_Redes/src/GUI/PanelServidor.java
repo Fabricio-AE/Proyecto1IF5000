@@ -39,7 +39,7 @@ import org.jdom.Element;
 public class PanelServidor extends JPanel implements ActionListener, MouseListener {
 
     private Border border;
-    private JButton jbtnListarImagenes, jbtnVer, jbtnObtenerImagen;
+    private JButton jbtnListarImagenes, jbtnVer, jbtnCombinar, jbtnObtenerImagen;
     private JComboBox<String> jcbImagenes;
     private Servidor servidor;
 
@@ -55,7 +55,7 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
             this.setVisible(true);
             this.addMouseListener(this);
         } catch (IOException ex) {
-            Logger.getLogger(PanelServidor.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }//constructor
 
@@ -73,6 +73,11 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
         this.jbtnVer.setBounds(this.getWidth() / 2 + 65, 50, 60, 30);
         this.jbtnVer.addActionListener(this);
         this.add(this.jbtnVer);
+        
+        this.jbtnCombinar = new JButton("Combinar");
+        this.jbtnCombinar.setBounds(this.getWidth() / 2 - 60, 460, 120, 30);
+        this.jbtnCombinar.addActionListener(this);
+        this.add(this.jbtnCombinar);
 
         this.jbtnObtenerImagen = new JButton("Obtener");
         this.jbtnObtenerImagen.setBounds(this.getWidth() / 2 - 60, 500, 120, 30);
@@ -107,7 +112,8 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
                 Thread.sleep(500);
                 this.initJComboBox();
             } else if (ae.getSource() == this.jbtnVer
-                    && !cliente.getNombre().equals("-1")) {
+                    && !cliente.getNombre().equals("-1")
+                    && this.jcbImagenes.getItemCount() != 0) {
                 ClientConnection clientConnection = ClientConnection.getInstance();
                 Element msg = new Element("msg");
 
@@ -125,7 +131,9 @@ public class PanelServidor extends JPanel implements ActionListener, MouseListen
                 clientConnection.enviar(Conversiones.anadirAccion(new Element("msg"), "obtener imagen"));
 
                 Thread.sleep(500);
-            }
+            }else if (ae.getSource() == this.jbtnCombinar){
+                this.servidor.getImagen().dispersarPartes();
+            }//else if
         } catch (IOException ex) {
             ex.printStackTrace();
         } catch (InterruptedException ex) {

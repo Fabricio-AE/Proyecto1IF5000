@@ -107,7 +107,6 @@ public class ClientConnection extends Thread {
     public void identificarAccion() throws JDOMException, IOException {
         Element element = Conversiones.stringToXML(this.accion);
         String opcion = element.getChild("accion").getValue();
-        System.out.println("Opcion: " + opcion);
         switch (opcion) {
             case "Cerrar":
                 this.online = false;
@@ -133,6 +132,18 @@ public class ClientConnection extends Thread {
                 Servidor servidor = Servidor.getInstance();
                 servidor.getImagen().getPartes().clear();
                 this.verImagen(element);
+                break;
+
+            case "verificar llegada":
+                this.verificarLlegada();
+                break;
+
+            case "respuesta llegada":
+                if (element.getChild("respuesta").getValue().equals("llegada incompleta")) {
+                    JOptionPane.showMessageDialog(null, "Error al recibir las partes. Realizar de nuevo la accion.");
+                }else{
+                    JOptionPane.showMessageDialog(null, "Enviada con exito");
+                }
                 break;
 
             case "borrar partes":
@@ -198,7 +209,8 @@ public class ClientConnection extends Thread {
             this.send.println(Conversiones.xmlToString(element));
             Thread.sleep(100);
         }//for i
-
+        
+        this.enviar(Conversiones.anadirAccion(new Element("msg"), "verificar llegada"));
     }//enviarImagen
 
     public void listarImagenes(Element element) throws IOException {
@@ -238,5 +250,20 @@ public class ClientConnection extends Thread {
         servidor.setImagen(new Imagen());
         servidor.getImagen().asignarImagen(tmp);
     }//verImagen
+
+    public void verificarLlegada() throws IOException {
+        Element msg = new Element("mgs");
+        Element respuesta = new Element("respuesta");
+        Cliente cliente = Cliente.getInstance();
+        System.out.println("Size: "+ cliente.getImagen().getPartes().size());
+        if (cliente.getImagen().getPartes().size() == 25) {
+            respuesta.addContent("llegada completa");
+        } else {
+            respuesta.addContent("llegada incompleta");
+        }
+
+        msg.addContent(respuesta);
+        this.enviar(Conversiones.anadirAccion(msg, "respuesta llegada"));
+    }//verificarLlegada
 
 }//end class

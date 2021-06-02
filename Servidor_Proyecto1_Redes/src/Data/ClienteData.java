@@ -15,32 +15,31 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 
 import Domain.Imagen;
+import Utility.Variables;
 
 public class ClienteData {
 	private String sqlConn;
 
 	public ClienteData() {
-		this.sqlConn = "jdbc:sqlserver://DESKTOP-OI0NS7V\\SQLSERVERDEV.database.windows.net:1433;"
-				+ "database=PROYECTO1_REDES;" + "user=sa;" + "password=2112;" + "loginTimeout=30;";
+		this.sqlConn = Variables.SERVIDORSQL
+				+ Variables.BDSERVIDORSQL + Variables.USUARIOSERVIDORSQL 
+				+ Variables.PASSWORDSERVIDORSQL
+				+ "loginTimeout=30;";
 	}
 
 	public String registrarUsuario(String nombre, String contrasenia) {
 		ResultSet resultSet = null;
 		String query = "EXECUTE sp_INSERT_CUENTA ?, ?";
 
-		try (Connection connection = DriverManager.getConnection(this.sqlConn);
-				PreparedStatement statement = connection.prepareStatement(query);) {
-
-			// Create and execute a SELECT SQL statement.
+		try {	
+			Connection connection = DriverManager.getConnection(this.sqlConn);
+			PreparedStatement statement = connection.prepareStatement(query);
 			
-			
-
 			statement.setString(1, nombre);
 			statement.setString(2, contrasenia);
 
 			resultSet = statement.executeQuery();
 
-			// Print results from select statement
 			while (resultSet.next()) {
 				return resultSet.getString(1);
 			}
@@ -55,18 +54,14 @@ public class ClienteData {
 		String query = "EXECUTE sp_INICIAR_SESION ?, ?";
 		String [] str = new String[2];
 
-		try (Connection connection = DriverManager.getConnection(this.sqlConn);
-				PreparedStatement statement = connection.prepareStatement(query);) {
-
-			// Create and execute a SELECT SQL statement.
-
+		try {
+			Connection connection = DriverManager.getConnection(this.sqlConn);
+			PreparedStatement statement = connection.prepareStatement(query);
+			
 			statement.setString(1, nombre);
 			statement.setString(2, contrasenia);
-
 			resultSet = statement.executeQuery();
 
-			// Print results from select statement
-			
 			while (resultSet.next()) {
 				if(resultSet.getString(1).equals("SESION INICIADA CON EXITO")) {
 					str[0] = resultSet.getString(1);
@@ -80,7 +75,7 @@ public class ClienteData {
 			str[0] = "Error en el servidor";
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}//try-catch
 		
 		return str;
 	}// iniciarSesion
