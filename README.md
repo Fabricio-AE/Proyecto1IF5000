@@ -9,6 +9,11 @@ Pasos para la correcta ejecución del proyecto:
 
 1.  Como primer paso es necesario crear la base de datos en la instancia local.
     Para ello es necesario ejecutar el Script que se encuentra en la carpta "SQL Server DB".
+    
+-Importante: Para crear la base de datos y conectarse a la instancia, es necesario
+modificar las variables que terminan en "SERVIDORSQL" en la clase Variables que se
+encuentra en el paquete Utility. Cada variable es necesario cambiarla según la configuración
+del servidor SQL Server en la computadora en la que se ejecuta el proyecto Servidor.
 
 2.  Seguidamente para ejecutar el proyecto es necesario abrir NetBeans y buscar
     el directorio del cliente y el servidor.
@@ -18,11 +23,6 @@ Pasos para la correcta ejecución del proyecto:
     jdom.jar que se encuentra en la carpeta lib del proyecto. Por otra parte, el
     servidor ocupa tanto jdom.jar como mssql-jdbc-9.2.1.jre8.jar que igualmente se
     encuentran en la carpeta lib del proyecto.
-    
--Importante: Para crear la base de datos y conectarse a la instancia, es necesario
-modificar las variables que terminan en "SERVIDORSQL" en la clase de Variables que se
-encuentra en el paquete Utility. Cada variable es necesario cambiarla según la configuración
-del servidor SQL Server en la computadora en la que se ejecuta el proyecto Servidor.
     
 *******************Ejecución del proyecto y uso dentro de él*******************
 
