@@ -19,6 +19,11 @@ Pasos para la correcta ejecución del proyecto:
     servidor ocupa tanto jdom.jar como mssql-jdbc-9.2.1.jre8.jar que igualmente se
     encuentran en la carpeta lib del proyecto.
     
+-Importante: Para crear la base de datos y conectarse a la instancia, es necesario
+modificar las variables que terminan en "SERVIDORSQL" en la clase de Variables que se
+encuentra en el paquete Utility. Cada variable es necesario cambiarla según la configuración
+del servidor SQL Server en la computadora en la que se ejecuta el proyecto Servidor.
+    
 *******************Ejecución del proyecto y uso dentro de él*******************
 
 4.  Luego de completar con exito los pasos anteriores, se ejecuta el servidor y luego
