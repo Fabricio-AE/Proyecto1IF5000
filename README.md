@@ -8,7 +8,7 @@ Pasos para la correcta ejecución del proyecto:
 *******************Preparación del entorno para la ejecución*******************
 
 1.  Como primer paso es necesario crear la base de datos en la instancia local.
-    Para ello es necesario ejecutar el Script que se encuentra en la carpta "###".
+    Para ello es necesario ejecutar el Script que se encuentra en la carpta "SQL Server DB".
 
 2.  Seguidamente para ejecutar el proyecto es necesario abrir NetBeans y buscar
     el directorio del cliente y el servidor.
@@ -24,7 +24,7 @@ Pasos para la correcta ejecución del proyecto:
     el o los clientes.
 
 5.  Dentro del cliente, es necesario loguearse o registrarse como usuario. Si ya tiene
-    un login entonces sale al paso ###, sino entonces debe pulsar el botón "Registrarse"
+    un login entonces sale al paso 8, sino, entonces debe pulsar el botón "Registrarse"
     que se encuentra en la sección de "Sesión".
 
 7.  En la ventan que se desplega, es necesario un nombre de usuario junto con una
